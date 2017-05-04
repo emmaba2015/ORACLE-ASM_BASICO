@@ -1,0 +1,29 @@
+  Creamos el diskgroup.
+
+CREATE DISKGROUP DARPRO_DG1 EXTERNAL REDUNDANCY DISK 'ORCL:DARPRO_DG1_LV1';
+  Cuando agregamos un disco a un diskgroup, ponemos primero el nombre del diskgroup y luego del disco que aparece en el campo PATH de la 
+  vista v$asm_disk.
+
+ALTER DISKGROUP DARPRO_DG1 ADD DISK 'ORCL:DARPRO_DG1_LV2';
+
+En el caso de querer agregar dos discos miembros a un diskgroup.
+
+ALTER DISKGROUP DARPRO_DG1 ADD DISK 'ORCL:DARPRO_DG1_LV2', 'ORCL:DARPRO_DG1_LV3';
+  Cuando tenemos agregados los discos, por tareas de mantenimiento u otros eventos podemos montar y desmontar los discos de la siguinete  
+  manera:
+
+ALTER DISKGROUP ALL DISMOUNT;
+ALTER DISKGROUP ALL MOUNT;
+ALTER DISKGROUP data DISMOUNT;
+ALTER DISKGROUP data MOUNT;
+
+  Dropeo de discos.
+
+  Para dropear un diskgroup tenemos dos caminos, o dropeamos los discos miembros y despúes el diskgroup, o dropeamos el diskgroup y su 
+  contenido.
+
+ALTER DISKGROUP DARPRO_DG1 DROP DISK DARPRO_DG1_LV3;
+  
+  O dropeamos el diskgroup y todos sus contenidos.
+
+DROP DISKGROUP DARPRO_DG1 INCLUDING CONTENTS;
