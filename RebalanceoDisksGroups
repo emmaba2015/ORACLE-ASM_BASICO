@@ -1,0 +1,43 @@
+  Rebalanceo de discos
+
+  Cuando nos dan espacio nuevo de storage, por ejemplo 100GB y solo disponibilizamos 50GB, podemos hacer un resize del tamaño con el 
+  siguiente sql al tamaño que deseamos, por ejemplo 70GB 65GB o 100GB como en el ejemplo.
+
+ALTER DISKGROUP DARPRO_DG1 RESIZE DISK DARPRO_DG1_LV2 SIZE 100G;
+
+  En el caso que agregamos un disco miembro a un diskgroup, el espacio alocado comienza a rebalancear, a repartirse en el nuevo miembro, 
+  en el espacio libre disponible. Por ejemplo tenemos un diskgroup de 100GB integrado por dos disco de 50G y una instancia de base de 
+  datos que ocupa 90GB, cuando agregamos un nuevo miembro , por ejemplo de 50GB, el ASM va a ver una unidad, un diskgroup de 150GB, y va 
+  a dividir los 90GB , en los tres discos ahora miembros. O sea que cada disco tendra aproximado 30GB de datos en cada disco miembro de 
+  50GB.
+
+  Este rebalanceo también ocurre cuando extraemos un disco siempre y cuando exista una relacion que nos permita quitarlo y vuelva 
+  a rebalancear.
+
+  Esto lo podemos hacer por medio del setencia REBALANCE mediante un ALTER DISKGROUP. En el caso que no elijamos un rebalanceo de manera 
+  manual, tal cual lo estamos por ejecutar, se ejecutara el rebalanceo automatico que toma del parametro ASM_POWER_LIMIT.
+
+show parameter ASM_POWER_LIMIT;
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+asm_power_limit 		     integer	 1
+
+  En nuestra instancia de ASM se encuentra en el menor balanceo posible, provocando que rebalacee en mayor tiempo y ocupe menos recursos.
+
+  Bien, ejecutemos ahora en un modo manual 5.
+
+ALTER DISKGROUP DARPRO_DG1 REBALANCE POWER 5;
+
+  Parametros
+
+  Desde la instancia de ASM podemos observar la configuracion del parametro asm_diskgroups, que nos indica cuales son los diskgroup que 
+  se montaran de manera automatica en el inicio.
+
+show parameter disk;
+
+NAME				     TYPE	 VALUE
+------------------------------------ ----------- ------------------------------
+asm_diskgroups			     string	 DARPRO_DG1, DARPRO_DG2, DARPRO_DG3, DARPRO_DG4, DARPRO_DG5
+asm_diskstring			     string
+disk_asynch_io
