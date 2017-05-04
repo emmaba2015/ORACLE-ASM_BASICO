@@ -1,0 +1,14 @@
+ASMCMD> c
+      commands:
+      cd
+      du
+      find
+      help
+      ls
+      lsct
+      lsdg
+      mkalias
+      mkdir
+      pwd
+      rm
+      rmalias
