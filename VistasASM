@@ -1,0 +1,83 @@
+  Cuando trabajamos desde la instancia de ASM podemos consultar las vistas asociadas, las principales son:
+
+  V$ASM_DISK Muestra informacion de cada disco que se encuentra en los diskgroups de cada instancia.
+  V$ASM_DISKGROUP Muestra informacion para cada diskgroup montado por instancia.
+  V$ASM_CLIENT Muestra una fila para cada instancia de base de datos con un grupo de discos administrados por la instancia de ASM.
+  V$ASM_TEMPLATE Muestra una fila con el contenido de objetos de asm asociados a un diskgroup por instancia.  
+
+select * from V$ASM_TEMPLATE;
+
+GROUP_NUMBER ENTRY_NUMBER REDUND STRIPE S NAME
+------------ ------------ ------ ------ - -------------------------
+	   2		0 UNPROT COARSE Y PARAMETERFILE
+	   2		1 UNPROT COARSE Y DUMPSET
+	   2		2 UNPROT FINE	Y CONTROLFILE
+	   2		3 UNPROT COARSE Y ARCHIVELOG
+	   2		4 UNPROT FINE	Y ONLINELOG
+	   2		5 UNPROT COARSE Y DATAFILE
+	   2		6 UNPROT COARSE Y TEMPFILE
+	   2		7 UNPROT COARSE Y BACKUPSET
+	   2		8 UNPROT COARSE Y AUTOBACKUP
+	   2		9 UNPROT COARSE Y XTRANSPORT
+	   2	  10 UNPROT COARSE Y CHANGETRACKING
+     
+V$ASM_CLIENT
+
+col INSTANCE_NAME format a30;
+col SOFTWARE_VERSION format a30;
+col COMPATIBLE_VERSION format a30;
+set line 150;
+select * from V$ASM_CLIENT;
+
+GROUP_NUMBER INSTANCE_NAME  DB_NAME  STATUS  SOFTWARE_VERSION COMPATIBLE_VERSION
+------------ -------------- -------- ---------- ----------- ----------------
+	   2 OPT2L1N	    OT2L1N   CONNECTED	10.2.0.4.0    10.2.0.4.0
+	   1 OPT2L1N	    OT2L1N   CONNECTED	10.2.0.4.0    10.2.0.4.0
+
+V$ASM_DISK
+
+  Vemos los discos miembros y su path en el operativo.
+
+  Cuando agregamos discos en el operativo, podemos utlizar esta query para verificar que discos miembros tengo disponibles para crear 
+  Diskgroups.
+
+set line 120;
+col path format a35;
+col name format a25;
+select name, path, group_number from v$asm_disk; 
+
+NAME			  PATH				      GROUP_NUMBER
+------------------------- ----------------------------------- ------------
+DARPRO_DG1_LV1		  ORCL:DARPRO_DG1_LV1				 1
+DARPRO_DG1_LV2		  ORCL:DARPRO_DG1_LV2				 1
+DARPRO_DG2_LV1		  ORCL:DARPRO_DG2_LV1				 2
+DARPRO_DG3_LV1		  ORCL:DARPRO_DG3_LV1				 3
+DARPRO_DG4_LV1		  ORCL:DARPRO_DG4_LV1				 4
+DARPRO_DG5_LV1		  ORCL:DARPRO_DG5_LV1				 5
+DARPRO_DG1_LV3		  ORCL:DARPRO_DG1_LV3				 1
+
+  Vemos los discos miembros, su path en el operativo, si esta ONLINE, su tamaño y espacio libre entre otras cosas.
+
+select name, path, mode_status, state, disk_number, total_mb, free_mb from v$asm_disk; 
+
+NAME			       PATH					MODE_ST STATE	 DISK_NUMBER   TOTAL_MB    FREE_MB
+------------------------------ ---------------------------------------- ------- -------- ----------- ---------- ----------
+DARPRO_DG1_LV1		       ORCL:DARPRO_DG1_LV1			ONLINE	NORMAL		   0	 102400     102349
+DARPRO_DG1_LV2		       ORCL:DARPRO_DG1_LV2			ONLINE	NORMAL		   1	 102400     102349
+DARPRO_DG1_LV3		       ORCL:DARPRO_DG1_LV3			ONLINE	NORMAL		   2	  51200      51149
+DARPRO_DG2_LV1		       ORCL:DARPRO_DG2_LV1			ONLINE	NORMAL		   0	  35840      35790
+DARPRO_DG3_LV1		       ORCL:DARPRO_DG3_LV1			ONLINE	NORMAL		   0	  35840      35790
+DARPRO_DG4_LV1		       ORCL:DARPRO_DG4_LV1			ONLINE	NORMAL		   0	  35840      35790
+DARPRO_DG5_LV1		       ORCL:DARPRO_DG5_LV1			ONLINE	NORMAL		   0	  51200      51150
+
+V$ASM_DISKGROUP
+
+select name, state, type, total_mb, free_mb from v$asm_diskgroup;
+
+NAME			       STATE	   TYPE     TOTAL_MB	FREE_MB
+------------------------------ ----------- ------ ---------- ----------
+DARPRO_DG1		       MOUNTED	   NORMAL     256000	 255847
+DARPRO_DG2		       MOUNTED	   EXTERN      35840	  35790
+DARPRO_DG3		       MOUNTED	   EXTERN      35840	  35790
+DARPRO_DG4		       MOUNTED	   EXTERN      35840	  35790
+DARPRO_DG5		       MOUNTED	   EXTERN      51200	  51150
