@@ -1,0 +1,12 @@
+  En primer lugar para buscar del nombre de la instancia y del ORACLE_HOME, deberemos mirar en el oratab:
+cat /etc/oratab | grep ASM 
+
+  Segun lo arrojado en el paso anterior setear las variables de entorno
+export ORACLE_HOME=/oracle/11.2.0/grid
+export ORACLE_SID="+ASM
+export PATH=$PATH:$ORACLE_HOME/bin
+
+  Ingresar a ASM
+asmcmd
+ASMCMD> 
+
